@@ -25,7 +25,7 @@ this.dataCriacao = new Date();
 
 return `Tarefa ${this.descricao} data de criação: ${this.dataCriacao} 
 <button class="remove-task btn" data-id= ${this.id}>Remover</button>
-<button class="concluded-task btn" data-id=${this.id}>Remover</button>`
+<button class="concluded-task btn" data-id=${this.id}>Concluida</button>`
     }
 }
 
@@ -44,47 +44,29 @@ class ListaDeTarefas {
     tarefas.splice(index, 1);
     }
 
-    filtrarTarefas() {
-       const todas = tarefas;
-       const pendentes =  tarefas.filter(tarefa=> !tarefa.concluida === true);
-       const concluidas = tarefas.filter(tarefa=> tarefa.concluida === true );
+    filtrarTarefas(filtro) { 
+    switch (filtro) { 
+    case "all": 
+       return tarefas;
+     case "concluded":
+    return tarefas.filter(tarefa=> tarefa.concluida === true );
+    case "pending":
+    return tarefas.filter(tarefa=> !tarefa.concluida === true);
+    }
 }
 
-exibirTarefas(filtro) {
-    list.innerHTML = '';
-    const tarefasParaExibir = filtro ? this.filtrarTarefas(filtro) : tarefas; // Aplica filtro, se necessário
+exibirTarefas(filtro = "all") {
+    list.innerHTML = ''; // Limpa a lista antes de exibir
+
+    const tarefasParaExibir = this.filtrarTarefas(filtro); // Aplica o filtro
     tarefasParaExibir.forEach(tarefa => {
-    let descricaoTarefa =  tarefa.toString(); 
-    li.innerHTML =  descricaoTarefa; 
-    list.append(li);
-    })
-
-concludedBtn.addEventListener("click", (event) =>  {
-    
-    let id = parseInt(event.target.getAttribute("data-id"));
-    const tarefaConcluida = tarefas.find(tarefa => tarefa.id === id);
-    if(tarefaConcluida !== undefined) {
-        tarefaConcluida.marcarConcluida();
-        this.exibirTarefas()
-    }})
-    
-    removeBtn.addEventListener("click", (event) =>  {
-    let id = parseInt(event.target.getAttribute("data-id"));
-    const tarefaIndex = tarefas.findIndex(tarefa => tarefa.id === id);
-     if(tarefaIndex !== -1) {
-         listadeTarefas.removerTarefa(tarefaIndex);
-         this.exibirTarefas();
-        } 
-        else{
-            console.log("tarefa não encontrada!")
-        }
-    }
-    
-    )
-
-    }
+        const li = document.createElement('li');
+        li.innerHTML = tarefa.toString(); // Exibe a tarefa
+        list.appendChild(li);
+    });
 }
-
+}
+    
 const listadeTarefas = new ListaDeTarefas();
 
 const list = document.getElementById("list");
@@ -116,13 +98,19 @@ addTask.addEventListener("click", () =>  {
 
 
 
-filterPending.addEventListener("click", () => {
-    listadeTarefas.exibirTarefas(filtrarTarefas(tarefa=> !tarefa.concluida === true))
-    
-})
+filterPending.addEventListener("click", (event) => {
+    if(event.target.classList.contains("pending")) {
+     exibirTarefas("pending")}
+    else if(event.target.classList.contains("concluded")) {
+        exibirTarefas("concluded")}
+    else {
+        exibirTarefas("all")}
+    }
+)
+
+
 
 filterConcluded.addEventListener("click", () => {
     listadeTarefas.exibirTarefas(filtrarTarefas(tarefa=> tarefa.concluida === true))
     
 })
-
