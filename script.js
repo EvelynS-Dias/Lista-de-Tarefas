@@ -16,14 +16,15 @@ this.dataCriacao = new Date();
 
     marcarConcluida() {
         this.concluida = true;
-    }
+}
 
     
     toString() {
     const dataFormatada = new Intl.DateTimeFormat( 'pt-BR', Tarefa.options).format(this.dataCriacao);
 
+    const status = this.concluida === false ? "pendente" : "concluida"
 
-return `Tarefa ${this.descricao} data de criação: ${dataFormatada} 
+return `Tarefa ${this.descricao} | data de criação: ${dataFormatada} Status: ${status}
 <button class="remove-task btn" data-id= ${this.id}>Remover</button>
 <button class="concluded-task btn" data-id=${this.id}>Concluida</button>`
     }
@@ -110,7 +111,8 @@ list.addEventListener("click", (event) => {
     }
     else if(event.target.classList.contains("concluded-task")) {
         let idButton = parseInt(event.target.getAttribute("data-id"));
-        listadeTarefas.marcarConcluida();
+        let tarefa = tarefas.find(tarefa => tarefa.id = idButton);
+        tarefa.marcarConcluida();
         listadeTarefas.exibirTarefas();
     }
 })
