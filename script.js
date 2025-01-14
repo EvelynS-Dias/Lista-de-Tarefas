@@ -24,7 +24,7 @@ this.dataCriacao = new Date();
 
     const status = this.concluida === false ? "pendente" : "concluida"
 
-return `Tarefa ${this.descricao} | data de criação: ${dataFormatada} Status: ${status}
+return `<strong>Tarefa:</strong> ${this.descricao} | <strong>data de criação:</strong> ${dataFormatada} <strong>Status:</strong> ${status}
 <button class="remove-task btn" data-id= ${this.id}>Remover</button>
 <button class="concluded-task btn" data-id=${this.id}>Concluida</button>`
     }
@@ -111,7 +111,7 @@ list.addEventListener("click", (event) => {
     }
     else if(event.target.classList.contains("concluded-task")) {
         let idButton = parseInt(event.target.getAttribute("data-id"));
-        let tarefa = tarefas.find(tarefa => tarefa.id = idButton);
+        let tarefa = tarefas.find(tarefa => tarefa.id === idButton);
         tarefa.marcarConcluida();
         listadeTarefas.exibirTarefas();
     }
