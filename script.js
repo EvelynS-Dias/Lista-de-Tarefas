@@ -1,6 +1,11 @@
 class Tarefa {
 
     static contador = 1;
+    static options = {
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+    }
 
     constructor(descricao) {
 this.descricao = descricao;
@@ -12,18 +17,13 @@ this.dataCriacao = new Date();
     marcarConcluida() {
         this.concluida = true;
     }
+
     
     toString() {
-        new Intl.DateTimeFormat( 'pt-BR', options);
-    
-        let options = {
-            day: "numeric",
-            month: "long",
-            year: "numeric"
-        }
+    const dataFormatada = new Intl.DateTimeFormat( 'pt-BR', Tarefa.options).format(this.dataCriacao);
 
 
-return `Tarefa ${this.descricao} data de criação: ${this.dataCriacao} 
+return `Tarefa ${this.descricao} data de criação: ${dataFormatada} 
 <button class="remove-task btn" data-id= ${this.id}>Remover</button>
 <button class="concluded-task btn" data-id=${this.id}>Concluida</button>`
     }
@@ -35,29 +35,33 @@ class ListaDeTarefas {
     adicionarTarefa(task) {
         const novaTarefa = new Tarefa(task);
         tarefas.push(novaTarefa);
-        toString();
         return tarefas;
   
     }
 
-    removerTarefa(index) {
+    removerTarefa(id) {
+    const index = tarefas.findIndex(tarefa => tarefa.id === id);
+    if(index === -1) {
+        console.log("Arquivo não encontrado")
+    }
+    else {
     tarefas.splice(index, 1);
     }
+}
 
-    filtrarTarefas(filtro) { 
+    filtrarTarefas(filtro){ 
     switch (filtro) { 
     case "all": 
        return tarefas;
      case "concluded":
     return tarefas.filter(tarefa=> tarefa.concluida === true );
     case "pending":
-    return tarefas.filter(tarefa=> !tarefa.concluida === true);
+    return tarefas.filter(tarefa=> !tarefa.concluida);
     }
 }
 
-exibirTarefas(filtro = "all") {
+    exibirTarefas(filtro = "all")  {
     list.innerHTML = ''; // Limpa a lista antes de exibir
-
     const tarefasParaExibir = this.filtrarTarefas(filtro); // Aplica o filtro
     tarefasParaExibir.forEach(tarefa => {
         const li = document.createElement('li');
@@ -73,15 +77,11 @@ const list = document.getElementById("list");
 const filterAll = document.getElementById('filter-all');
 const filterPending = document.getElementById("filter-pending");
 const filterConcluded = document.getElementById("filter-concluded")
-const addTask = document.getElementById("add-task btn");
+const addTask = document.getElementById("add-task");
 const task = document.getElementById("task"); //Descrição da task adicionada no input
 const concludedBtn = document.getElementById(".concludedBtn");
-const removeBtn = document.querySelectorAll(".removeBtn")
 const inputTask = document.getElementById("descriptionTask");
-
-addTask.addEventListener("click", adicionarTarefa);
-
-
+const removeBtn = document.getElementById("remove-task");
 
 
 
@@ -89,28 +89,33 @@ addTask.addEventListener("click", adicionarTarefa);
 // do botão escolhido, ele vai marcar como concluida.
 
 addTask.addEventListener("click", () =>  {
+    if(inputTask.value === '') {
+        console.log("Por favor, insira uma descrição");
+    }
+    else{
     descriptionTask = inputTask.value.trim() ///O trim vai tirar     OS       ESPACOS      desnecessários
     listadeTarefas.adicionarTarefa(descriptionTask);
     inputTask.value = '';
     listadeTarefas.exibirTarefas();
 }
+}
 )
 
-
-
-filterPending.addEventListener("click", (event) => {
-    if(event.target.classList.contains("pending")) {
-     exibirTarefas("pending")}
-    else if(event.target.classList.contains("concluded")) {
-        exibirTarefas("concluded")}
-    else {
-        exibirTarefas("all")}
+list.addEventListener("click", (event) => {
+    if(event.target.classList.contains("remove-task")) {
+   let idButton = parseInt(event.target.getAttribute("data-id"));
+   console.log(idButton)
+        listadeTarefas.removerTarefa(idButton);
+        listadeTarefas.exibirTarefas();
     }
-)
-
-
-
-filterConcluded.addEventListener("click", () => {
-    listadeTarefas.exibirTarefas(filtrarTarefas(tarefa=> tarefa.concluida === true))
-    
+    else if(event.target.classList.contains("concluded-task")) {
+        let idButton = parseInt(event.target.getAttribute("data-id"));
+        listadeTarefas.marcarConcluida();
+        listadeTarefas.exibirTarefas();
+    }
 })
+
+
+filterAll.addEventListener("click", () => listadeTarefas.exibirTarefas("all"));
+filterPending.addEventListener("click", () => listadeTarefas.exibirTarefas("pending"));
+filterConcluded.addEventListener("click", () => listadeTarefas.exibirTarefas("concluded"));
